@@ -89,8 +89,7 @@ describe('Класс Level', () => {
 
     it('Имеет свойство player, в котором движущийся объект со свойством type равным player', () => {
       const level = new Level(undefined, [ player, mushroom ]);
-
-      expect(level.player).to.equal(player);
+      expect(level.player).to.eql(player);
     });
   });
 
@@ -161,10 +160,9 @@ describe('Класс Level', () => {
     });
 
     it('Вернет объект игрового поля, который пересекается с переданным объектом', () => {
-      const level = new Level(undefined, [ player, mushroom ]);
+      const level = new Level([[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]], [ player, mushroom ]);
 
       const actor = level.actorAt(player);
-
       expect(actor).to.be.equal(mushroom);
     });
 
@@ -229,9 +227,7 @@ describe('Класс Level', () => {
     it('Вернет строку wall если площадь пересекается со стеной', () => {
       const level = new Level(wallGrid);
       const position = new Vector(0, 0);
-
       const wall = level.obstacleAt(position, size);
-
       expect(wall).to.be.equal('wall');
     });
 
