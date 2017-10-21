@@ -345,7 +345,7 @@ describe('Класс Level', () => {
   describe('Метод noMoreActors', () => {
     it('Вернет истину, если движущихся объектов нет в уровне', () => {
       const level = new Level();
-
+      wrt(level);
       expect(level.noMoreActors()).to.be.true;
     });
 
@@ -357,7 +357,7 @@ describe('Класс Level', () => {
 
     it('Вернет ложь, если в уровне есть движущихся объекты заданного типа', () => {
       const level = new Level(undefined, [ mushroom, giftSmall ]);
-
+      wrt(level.noMoreActors('mushroom'));
       expect(level.noMoreActors('mushroom')).to.be.false;
     });
   });

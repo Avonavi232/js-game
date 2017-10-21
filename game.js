@@ -149,9 +149,15 @@ class Level{
     }
 
     noMoreActors(type){
-        this.actors.forEach(function (el, i) {
-            
-        })
+        if (!(this.actors))
+            return true;
+        
+        for(let el of this.actors){
+            if(el.type === type){
+                return false;
+            }
+        }
+        return true;
     }
 }
 
