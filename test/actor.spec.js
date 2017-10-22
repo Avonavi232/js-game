@@ -59,6 +59,7 @@ describe('Класс Actor', () => {
 
     it('По умолчанию создается объект со свойством type равным actor', () => {
       const player = new Actor();
+
       expect(player.type).to.equal('actor');
     });
 

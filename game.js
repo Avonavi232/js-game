@@ -4,6 +4,12 @@ function wrt(data) {
     console.log(data);
 }
 
+function extender(base, props = {}) {
+    const result = class extends base {};
+    Object.defineProperties(result.prototype, props);
+    return result;
+}
+
 /*Test OK*/
 class Vector{
     constructor(posX = 0, posY = 0){
@@ -67,8 +73,6 @@ Object.defineProperties(Actor.prototype, {
 });
 
 
-
-
 class Level{
     constructor(grid, actors){
         if(grid){
@@ -84,16 +88,15 @@ class Level{
             this.height = 0;
             this.width = 0;
         }
-        this.actors = actors;
-        const Player = class extends Actor {
-            constructor(){
-                super();
-                this.title = 'Игрок';
-            }
-        };
-        Object.defineProperties(Player.prototype, { type: { value: 'player' }});
 
-        this.player = new Player();
+        if(actors){
+            this.actors = actors;
+            this.player = (this.actors.find(function (el) {
+                return (el.type === 'player');
+            }));
+        }
+
+
         this.status = null;
         this.finishDelay = 1;
     }
@@ -106,17 +109,13 @@ class Level{
         if ( !(pos instanceof Actor) || pos === undefined ){
             throw new Error ('Исключение брошено из метода actorAt класса Level');
         }
-        if(this.grid){
-
+        if(this.actors){
             for(let actor of this.actors){
-
                 if (pos.isIntersect(actor)){
                     return actor;
                 }
             }
         }
-
-
     }
 
     obstacleAt(moveTo, size){
@@ -151,7 +150,7 @@ class Level{
     noMoreActors(type){
         if (!(this.actors))
             return true;
-        
+
         for(let el of this.actors){
             if(el.type === type){
                 return false;
@@ -160,10 +159,6 @@ class Level{
         return true;
     }
 }
-
-
-
-
 
 
 /*Тестовый код*/
@@ -210,11 +205,11 @@ let grid = [
     [1, 2, 3, 4, 5],
 ];
 
-//let lev = new Level(grid);
 
 //lev.obstacleAt(new Vector(4,0), new Vector(1,1));
 
-//wrt(lev.player);
+let level = new Level();
+wrt(level);
 
 
 
