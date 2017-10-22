@@ -126,7 +126,6 @@ class Level{
 
         let newActor = new Actor(moveTo, size);
 
-
         if (newActor.bottom > this.height){
             return 'lava';
         } else if ( (newActor.left < 0) || (newActor.right > this.width) || (newActor.top < 0) ){
@@ -134,7 +133,7 @@ class Level{
         }
 
         for(let i = newActor.top; i <= newActor.bottom; i++){
-            for(let j = newActor.left; i<= newActor.right; i++){
+            for(let j = newActor.left; j<= newActor.right; j++){
                 return(this.grid[i][j]);
             }
         }
@@ -188,6 +187,9 @@ player.title = 'Игрок';
 const grid = [
 
     [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
     ['wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
     [undefined, undefined, undefined, undefined, undefined, undefined],
     [undefined, undefined, undefined, undefined, undefined, undefined],
@@ -233,29 +235,10 @@ const gold = new GoldCoin(new Vector(3,5));
 const bronze = new BronzeCoin(new Vector(3,9));
 const fireball = new Actor(new Vector(0,6));
 
-const level = new Level(grid, [ gold, bronze, player, fireball ]);
+const level = new Level(grid, [ gold, bronze, player]);
 
 runLevel(level, DOMDisplay)
     .then(status => console.log(`Игрок ${status}`));
-
-// level.playerTouched('coin', gold);
-// level.playerTouched('coin', bronze);
-//
-//
-// if (level.noMoreActors('coin')) {
-//     console.log('Все монеты собраны');
-//     console.log(`Статус игры: ${level.status}`);
-// }
-//
-// const obstacle = level.obstacleAt(new Vector(1, 1), player.size);
-// if (obstacle) {
-//     console.log(`На пути препятствие: ${obstacle}`);
-// }
-//
-// const otherActor = level.actorAt(player);
-// if (otherActor === fireball) {
-//     console.log('Пользователь столкнулся с шаровой молнией');
-// }
 
 
 
