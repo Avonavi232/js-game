@@ -148,68 +148,115 @@ class Level{
     }
 
     noMoreActors(type){
-        if (!(this.actors))
+        if (!(this.actors)){
             return true;
+        }
 
-        for(let el of this.actors){
-            if(el.type === type){
-                return false;
+        return !( this.actors.find(function (el) {
+            return (el.type === type);
+        }) );
+
+    }
+
+    playerTouched(obstacle, actor){
+
+        if(this.status === null){
+
+            if ( (obstacle === 'lava') || (obstacle === 'fireball') ){
+                this.status = 'lost';
+            } else if ( (obstacle === 'coin') && (actor.type === 'coin') ) {
+
+                this.removeActor(actor);
+
+                if(this.noMoreActors('coin')){
+                    this.status = 'won';
+                }
             }
         }
-        return true;
     }
 }
 
 
 /*Тестовый код*/
-const items = new Map();
-const player = new Actor();
-items.set('Игрок', player);
-items.set('Первая монета', new Actor(new Vector(10, 10)));
-items.set('Вторая монета', new Actor(new Vector(15, 5)));
 
-function position(item) {
-    return ['left', 'top', 'right', 'bottom']
-        .map(side => `${side}: ${item[side]}`)
-        .join(', ');
-}
-
-function movePlayer(x, y) {
-    player.pos = player.pos.plus(new Vector(x, y));
-}
-
-function status(item, title) {
-    console.log(`${title}: ${position(item)}`);
-    if (player.isIntersect(item)) {
-        console.log(`Игрок подобрал ${title}`);
-    }
-}
-
-// items.forEach(status);
-// movePlayer(10, 10);
-// items.forEach(status);
-// movePlayer(5, -5);
-// items.forEach(status);
+const Player = extender(Actor, { type: { value: 'player' }});
+let player = new Player(new Vector(4,0));
+player.title = 'Игрок';
 
 
-let grid = [
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
-    [1, 2, 3, 4, 5],
+
+const grid = [
+
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
+
 ];
 
 
-//lev.obstacleAt(new Vector(4,0), new Vector(1,1));
 
-let level = new Level();
-wrt(level);
+const GoldCoin = extender(Actor, {
+    type: {
+        value: 'coin'
+    },
+    title: {
+        value: 'Золото'
+    }
+});
+const BronzeCoin = extender(Actor, {
+    type: {
+        value: 'coin'
+    },
+    title: {
+        value: 'Бронза'
+    }
+});
+const WallMaker = extender(Actor, {
+    type: {
+        value: 'wall'
+    },
+    title: {
+        value: 'стена'
+    }
+});
+
+const gold = new GoldCoin(new Vector(3,5));
+const bronze = new BronzeCoin(new Vector(3,9));
+const fireball = new Actor(new Vector(0,6));
+
+const level = new Level(grid, [ gold, bronze, player, fireball ]);
+
+runLevel(level, DOMDisplay)
+    .then(status => console.log(`Игрок ${status}`));
+
+// level.playerTouched('coin', gold);
+// level.playerTouched('coin', bronze);
+//
+//
+// if (level.noMoreActors('coin')) {
+//     console.log('Все монеты собраны');
+//     console.log(`Статус игры: ${level.status}`);
+// }
+//
+// const obstacle = level.obstacleAt(new Vector(1, 1), player.size);
+// if (obstacle) {
+//     console.log(`На пути препятствие: ${obstacle}`);
+// }
+//
+// const otherActor = level.actorAt(player);
+// if (otherActor === fireball) {
+//     console.log('Пользователь столкнулся с шаровой молнией');
+// }
+
 
 
 
