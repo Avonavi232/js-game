@@ -132,11 +132,25 @@ class Level{
             return 'wall';
         }
 
-        for(let i = newActor.top; i <= newActor.bottom; i++){
-            for(let j = newActor.left; j<= newActor.right; j++){
-                return(this.grid[Math.round(i)][Math.round(j)]);
+        let i = Math.floor(newActor.top);
+        let iTo = Math.ceil(newActor.bottom);
+        let j = Math.floor(newActor.left);
+        let jTo = Math.ceil(newActor.right);
+
+        //wrt(`player posX: ${newActor.pos.x}, posY: ${newActor.pos.y}`);
+        //wrt(`Плеер находится в: left: ${newActor.left}, right: ${newActor.right}, top: ${newActor.top}, bottom: ${newActor.bottom}, `);
+
+        //wrt(`Будем исследовать от ${i} до ${iTo} сверху вниз, и от ${j} до ${jTo} слева направо`);
+
+        for(let I = i; I < iTo; I++){
+            for(let J = j; J < jTo; J++){
+                //wrt(`Исследуем i = ${Math.floor(i)}, j = ${Math.floor(j)}`);
+                if(this.grid[I][J]){
+                    return this.grid[I][J];
+                }
             }
         }
+        //wrt('\n');
     }
 
     removeActor(actor){
@@ -175,10 +189,6 @@ class Level{
     }
 }
 
-
-/*Тестовый код*/
-
-
 const Player = class extends Actor{
     constructor(pos = new Vector(), size = new Vector(0.8, 1.5), speed = new Vector()){
         super();
@@ -195,36 +205,81 @@ Object.defineProperties(Player.prototype, {
     }
 });
 
-const player = new Player(new Vector(1,1));
 
 
 
-
+/*Тестовый код*/
 
 const grid = [
 
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined, undefined, undefined, undefined, undefined, undefined],
-    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
-
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, 'wall', undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, 'wall', undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, 'wall', undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, 'wall', undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, 'wall'],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, 'wall', undefined],
+    ['wall','wall','wall','wall','wall','wall','wall','wall','wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall']
 ];
-
+const player = new Player(new Vector(1, grid.length-2));
 
 
 const GoldCoin = extender(Actor, {
@@ -252,8 +307,8 @@ const WallMaker = extender(Actor, {
     }
 });
 
-const gold = new GoldCoin(new Vector(3,5));
-const bronze = new BronzeCoin(new Vector(3,9));
+const gold = new GoldCoin(new Vector(1,11));
+const bronze = new BronzeCoin(new Vector(3,1));
 const fireball = new Actor(new Vector(0,6));
 
 const level = new Level(grid, [ gold, bronze, player]);
