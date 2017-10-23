@@ -13,8 +13,8 @@ function extender(base, props = {}) {
 /*Test OK*/
 class Vector{
     constructor(posX = 0, posY = 0){
-        this.x = Math.round(posX);
-        this.y = Math.round(posY);
+        this.x = posX;
+        this.y = posY;
     }
     plus(vector){
         if ( !(vector instanceof Vector) ){
@@ -134,7 +134,7 @@ class Level{
 
         for(let i = newActor.top; i <= newActor.bottom; i++){
             for(let j = newActor.left; j<= newActor.right; j++){
-                return(this.grid[i][j]);
+                return(this.grid[Math.round(i)][Math.round(j)]);
             }
         }
     }
@@ -178,14 +178,35 @@ class Level{
 
 /*Тестовый код*/
 
-const Player = extender(Actor, { type: { value: 'player' }});
-let player = new Player(new Vector(4,0));
-player.title = 'Игрок';
+
+const Player = class extends Actor{
+    constructor(pos = new Vector(), size = new Vector(0.8, 1.5), speed = new Vector()){
+        super();
+        this.pos = pos.plus(new Vector(0, -0.5));
+        this.size = size;
+    }
+};
+Object.defineProperties(Player.prototype, {
+    type: {
+        value: 'player'
+    },
+    title: {
+        value: 'Игрок'
+    }
+});
+
+const player = new Player(new Vector(1,1));
+
+
 
 
 
 const grid = [
 
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
+    [undefined, undefined, undefined, undefined, undefined, undefined],
     [undefined, undefined, undefined, undefined, undefined, undefined],
     [undefined, undefined, undefined, undefined, undefined, undefined],
     [undefined, undefined, undefined, undefined, undefined, undefined],

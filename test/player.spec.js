@@ -10,7 +10,7 @@ describe('Класс Player', () => {
   describe('Конструктор', () => {
     it('Создает объект реальная позиция которого отличается от той что передана в конструктор на вектор 0:-0,5', () => {
       const player = new Player(position);
-
+      wrt(player);
       expect(player.pos).to.eql(new Vector(10, 4.5));
     });
 
