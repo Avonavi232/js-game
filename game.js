@@ -297,7 +297,6 @@ const Fireball = class extends Actor{
         }
     }
 };
-
 const HorizontalFireball = class extends Fireball{
     constructor(pos = new Vector(0, 0), speed = new Vector(2,0)){
         super(pos, speed);
@@ -368,105 +367,8 @@ const Coin = class extends Actor{
 
 
 
-/*Тестовый код*/
+/*Запуск*/
 
-
-const schemas = [
-    [
-        "     v                 ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "  |xxx       w         ",
-        "  o                 o  ",
-        "  x               = x  ",
-        "  x          o o    x  ",
-        "  x  @    *  xxxxx  x  ",
-        "  xxxxx             x  ",
-        "      x!!!!!!!!!!!!!x  ",
-        "      xxxxxxxxxxxxxxx  ",
-        "                       "
-    ],
-    [
-        "     v                 ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "  |                    ",
-        "  o                 o  ",
-        "  x               = x  ",
-        "  x          o o    x  ",
-        "  x  @       xxxxx  x  ",
-        "  xxxxx             x  ",
-        "      x!!!!!!!!!!!!!x  ",
-        "      xxxxxxxxxxxxxxx  ",
-        "                       "
-    ],
-    [
-        "        |           |  ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "                       ",
-        "     |                 ",
-        "                       ",
-        "         =      |      ",
-        " @ |  o            o   ",
-        "xxxxxxxxx!!!!!!!xxxxxxx",
-        "                       "
-    ],
-    [
-        "                       ",
-        "                       ",
-        "                       ",
-        "    o                  ",
-        "    x      | x!!x=     ",
-        "         x             ",
-        "                      x",
-        "                       ",
-        "                       ",
-        "                       ",
-        "               xxx     ",
-        "                       ",
-        "                       ",
-        "       xxx  |          ",
-        "                       ",
-        " @                     ",
-        "xxx                    ",
-        "                       "
-    ], [
-        "   v         v",
-        "              ",
-        "         !o!  ",
-        "              ",
-        "              ",
-        "              ",
-        "              ",
-        "         xxx  ",
-        "          o   ",
-        "        =     ",
-        "  @           ",
-        "  xxxx        ",
-        "  |           ",
-        "      xxx    x",
-        "              ",
-        "          !   ",
-        "              ",
-        "              ",
-        " o       x    ",
-        " x      x     ",
-        "       x      ",
-        "      x       ",
-        "   xx         ",
-        "              "
-    ]
-]
 const actorDict = {
     '@': Player,
     'v': FireRain,
@@ -474,54 +376,17 @@ const actorDict = {
     '=': HorizontalFireball,
     '|': VerticalFireball
 };
-
 const parser = new LevelParser(actorDict);
-
-
-runGame(schemas, parser, DOMDisplay)
-    .then(() => console.log('Вы выиграли приз!'));
-
-
-
-
-
-// const GoldCoin = extender(Actor, {
-//     type: {
-//         value: 'coin'
-//     },
-//     title: {
-//         value: 'Золото'
-//     }
-// });
-// const BronzeCoin = extender(Actor, {
-//     type: {
-//         value: 'coin'
-//     },
-//     title: {
-//         value: 'Бронза'
-//     }
-// });
-// const WallMaker = extender(Actor, {
-//     type: {
-//         value: 'wall'
-//     },
-//     title: {
-//         value: 'стена'
-//     }
-// });
-//
-// const gold = new GoldCoin(new Vector(1,11));
-// const bronze = new BronzeCoin(new Vector(3,1));
-// const fireball = new Actor(new Vector(0,6));
-//
-// const level = new Level(grid, [ gold, bronze, player]);
-//
-// runLevel(level, DOMDisplay)
-//     .then(status => console.log(`Игрок ${status}`));
-
-
-
-
+loadLevels()
+    .then((levels) => {
+        let sch;
+        try{
+            sch = JSON.parse(levels);
+            runGame(sch, parser, DOMDisplay);
+        } catch (err){
+            console.error(err);
+        }
+    });
 
 
 
