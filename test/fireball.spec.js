@@ -47,9 +47,9 @@ describe('Класс Fireball', () => {
 
     it('Вернет новую позицию, увеличенную на вектор скорости', () => {
       const ball = new Fireball(position, speed);
-
+      wrt(ball);
       const nextPosition = ball.getNextPosition();
-
+      wrt(nextPosition);
       expect(nextPosition).to.eql(new Vector(6, 5));
     });
 

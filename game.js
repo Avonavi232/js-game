@@ -72,7 +72,7 @@ Object.defineProperties(Actor.prototype, {
     }
 });
 
-
+/*Test OK*/
 class Level{
     constructor(grid, actors){
         if(grid){
@@ -137,20 +137,13 @@ class Level{
         let j = Math.floor(newActor.left);
         let jTo = Math.ceil(newActor.right);
 
-        //wrt(`player posX: ${newActor.pos.x}, posY: ${newActor.pos.y}`);
-        //wrt(`Плеер находится в: left: ${newActor.left}, right: ${newActor.right}, top: ${newActor.top}, bottom: ${newActor.bottom}, `);
-
-        //wrt(`Будем исследовать от ${i} до ${iTo} сверху вниз, и от ${j} до ${jTo} слева направо`);
-
         for(let I = i; I < iTo; I++){
             for(let J = j; J < jTo; J++){
-                //wrt(`Исследуем i = ${Math.floor(i)}, j = ${Math.floor(j)}`);
                 if(this.grid[I][J]){
                     return this.grid[I][J];
                 }
             }
         }
-        //wrt('\n');
     }
 
     removeActor(actor){
@@ -205,116 +198,326 @@ Object.defineProperties(Player.prototype, {
     }
 });
 
+/*Test OK*/
+class LevelParser{
+    constructor(dict){
+        this.dict = dict;
+    }
+
+    actorFromSymbol(str){
+        if (!str)
+            return;
+        const key = ((Object.keys(this.dict)).find(function (el) {
+            return (str === el);
+        }));
+        return this.dict[key];
+    }
+
+    obstacleFromSymbol(str){
+        if (!str)
+            return;
+        switch (str){
+            case 'x':
+                return 'wall';
+            case '!':
+                return 'lava';
+            default:
+                return;
+        }
+    }
+
+    createGrid(grid){
+        if(!grid)
+            return;
+        const newGrid = [];
+        for(let row of grid){
+            newGrid.push([]);
+            for(let item of row.split('')){
+                newGrid[newGrid.length-1].push(this.obstacleFromSymbol(item));
+            }
+        }
+        return newGrid;
+    }
+
+    createActors(grid){
+        if(!grid)
+            return;
+        if(!this.dict)
+            return [];
+        const actors = [];
+        const self = this;
+        grid.forEach( function (row, i) {
+            row.split('').forEach( function(item, j){
+                if(typeof self.actorFromSymbol(item) === 'function') {
+                    if ((self.actorFromSymbol(item)).prototype instanceof Actor || (self.actorFromSymbol(item)) === Actor) {
+                        let creator = self.actorFromSymbol(item);
+                        actors.push(new creator(new Vector(j, i)));
+                    }
+                }
+            });
+        });
+        return actors;
+    }
+
+    parse(grid){
+        return new Level(this.createGrid(grid), this.createActors(grid));
+    }
+}
+
+const Fireball = class extends Actor{
+    constructor(pos = new Vector(0, 0), speed = new Vector(0,0)){
+        super(pos);
+        this.size = new Vector(1,1);
+        this.speed = speed;
+        Object.defineProperties(this, {
+            type: {
+                value: 'fireball'
+            },
+            title: {
+                value: 'Fireball'
+            }
+        });
+    }
+
+    getNextPosition(time = 1){
+        return new Vector(this.pos.x + time*this.speed.x, this.pos.y + time*this.speed.y);
+    }
+
+    handleObstacle(){
+        this.speed.x = -this.speed.x;
+        this.speed.y = -this.speed.y;
+    }
+
+    act(time, level){
+        let newPos = this.getNextPosition(time);
+        if(level.obstacleAt(newPos, this.size)){
+            this.handleObstacle();
+        } else {
+            this.pos = newPos;
+        }
+    }
+};
+
+const HorizontalFireball = class extends Fireball{
+    constructor(pos = new Vector(0, 0), speed = new Vector(2,0)){
+        super(pos, speed);
+    }
+};
+const VerticalFireball = class extends Fireball{
+    constructor(pos = new Vector(0, 0), speed = new Vector(0,2)){
+        super(pos, speed);
+    }
+};
+const FireRain = class extends Fireball{
+    constructor(pos = new Vector(0, 0)){
+        super(pos);
+        this.speed = new Vector(0,3);
+        this.initialPos = pos;
+    }
+
+    handleObstacle(){
+        this.pos = this.initialPos;
+    }
+};
+const Coin = class extends Actor{
+    constructor(pos = new Vector()){
+        super();
+        this.size = new Vector(0.6, 0.6);
+        this.pos = pos.plus(new Vector(0.2, 0.1));
+        Object.defineProperties(this, {
+            type: {
+                value: 'coin'
+            },
+            title: {
+                value: 'Золотая монетка'
+            },
+            spring: {
+                value: Math.random() * 2*Math.PI,
+                writable: true
+            },
+            springSpeed: {
+                value: 8
+            },
+            springDist: {
+                value: 0.07
+            }
+        });
+    }
+
+    updateSpring(time = 1){
+        this.spring += this.springSpeed*time;
+        // while(this.spring >= 2*Math.PI){
+        //     this.spring -= 2*Math.PI;
+        // }
+    }
+
+    getSpringVector(){
+        let y = Math.sin(this.spring) * this.springDist;
+        return new Vector(0, y);
+    }
+
+    getNextPosition(time = 1){
+        this.updateSpring(time);
+        return this.pos.plus(this.getSpringVector());
+    }
+
+    act(time){
+        this.pos = this.getNextPosition(time);
+    }
+};
 
 
 
 /*Тестовый код*/
 
-const grid = [
 
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, 'wall', undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, 'wall', undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, 'wall', undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, 'wall', undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, 'wall', undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, 'wall'],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, 'wall', undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined],
-    [undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined, undefined, undefined, undefined, undefined, 'wall', undefined],
-    ['wall','wall','wall','wall','wall','wall','wall','wall','wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall']
-];
-const player = new Player(new Vector(1, grid.length-2));
+const schemas = [
+    [
+        "     v                 ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "  |xxx       w         ",
+        "  o                 o  ",
+        "  x               = x  ",
+        "  x          o o    x  ",
+        "  x  @    *  xxxxx  x  ",
+        "  xxxxx             x  ",
+        "      x!!!!!!!!!!!!!x  ",
+        "      xxxxxxxxxxxxxxx  ",
+        "                       "
+    ],
+    [
+        "     v                 ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "  |                    ",
+        "  o                 o  ",
+        "  x               = x  ",
+        "  x          o o    x  ",
+        "  x  @       xxxxx  x  ",
+        "  xxxxx             x  ",
+        "      x!!!!!!!!!!!!!x  ",
+        "      xxxxxxxxxxxxxxx  ",
+        "                       "
+    ],
+    [
+        "        |           |  ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "                       ",
+        "     |                 ",
+        "                       ",
+        "         =      |      ",
+        " @ |  o            o   ",
+        "xxxxxxxxx!!!!!!!xxxxxxx",
+        "                       "
+    ],
+    [
+        "                       ",
+        "                       ",
+        "                       ",
+        "    o                  ",
+        "    x      | x!!x=     ",
+        "         x             ",
+        "                      x",
+        "                       ",
+        "                       ",
+        "                       ",
+        "               xxx     ",
+        "                       ",
+        "                       ",
+        "       xxx  |          ",
+        "                       ",
+        " @                     ",
+        "xxx                    ",
+        "                       "
+    ], [
+        "   v         v",
+        "              ",
+        "         !o!  ",
+        "              ",
+        "              ",
+        "              ",
+        "              ",
+        "         xxx  ",
+        "          o   ",
+        "        =     ",
+        "  @           ",
+        "  xxxx        ",
+        "  |           ",
+        "      xxx    x",
+        "              ",
+        "          !   ",
+        "              ",
+        "              ",
+        " o       x    ",
+        " x      x     ",
+        "       x      ",
+        "      x       ",
+        "   xx         ",
+        "              "
+    ]
+]
+const actorDict = {
+    '@': Player,
+    'v': FireRain,
+    'o': Coin,
+    '=': HorizontalFireball,
+    '|': VerticalFireball
+};
+
+const parser = new LevelParser(actorDict);
 
 
-const GoldCoin = extender(Actor, {
-    type: {
-        value: 'coin'
-    },
-    title: {
-        value: 'Золото'
-    }
-});
-const BronzeCoin = extender(Actor, {
-    type: {
-        value: 'coin'
-    },
-    title: {
-        value: 'Бронза'
-    }
-});
-const WallMaker = extender(Actor, {
-    type: {
-        value: 'wall'
-    },
-    title: {
-        value: 'стена'
-    }
-});
+runGame(schemas, parser, DOMDisplay)
+    .then(() => console.log('Вы выиграли приз!'));
 
-const gold = new GoldCoin(new Vector(1,11));
-const bronze = new BronzeCoin(new Vector(3,1));
-const fireball = new Actor(new Vector(0,6));
 
-const level = new Level(grid, [ gold, bronze, player]);
 
-runLevel(level, DOMDisplay)
-    .then(status => console.log(`Игрок ${status}`));
+
+
+// const GoldCoin = extender(Actor, {
+//     type: {
+//         value: 'coin'
+//     },
+//     title: {
+//         value: 'Золото'
+//     }
+// });
+// const BronzeCoin = extender(Actor, {
+//     type: {
+//         value: 'coin'
+//     },
+//     title: {
+//         value: 'Бронза'
+//     }
+// });
+// const WallMaker = extender(Actor, {
+//     type: {
+//         value: 'wall'
+//     },
+//     title: {
+//         value: 'стена'
+//     }
+// });
+//
+// const gold = new GoldCoin(new Vector(1,11));
+// const bronze = new BronzeCoin(new Vector(3,1));
+// const fireball = new Actor(new Vector(0,6));
+//
+// const level = new Level(grid, [ gold, bronze, player]);
+//
+// runLevel(level, DOMDisplay)
+//     .then(status => console.log(`Игрок ${status}`));
 
 
 

@@ -178,7 +178,6 @@ describe('Класс LevelParser', () => {
       const parser = new LevelParser({ z: Actor });
 
       const actors = parser.createActors(['z']);
-
       expect(actors).to.have.length(1);
     });
 
