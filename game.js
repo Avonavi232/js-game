@@ -20,10 +20,10 @@ class Vector{
         if ( !(vector instanceof Vector) ){
             throw new Error ('Можно прибавлять к вектору только вектор типа Vector');
         }
-        return new Vector( (this.x + vector.x), (this.y + vector.y) );
+        return new Vector( this.x + vector.x, this.y + vector.y );
     }
     times(rate){
-        return new Vector( (this.x * rate), (this.y * rate) );
+        return new Vector( this.x * rate, this.y * rate );
     }
 }
 
@@ -50,6 +50,9 @@ class Actor{
     get bottom(){
         return this.pos.y + this.size.y;
     }
+    get type(){
+        return 'actor';
+    }
     act(){
 
     }
@@ -65,12 +68,6 @@ class Actor{
 
     }
 }
-Object.defineProperties(Actor.prototype, {
-    'type': {
-        value: 'actor',
-        configurable: true,
-    }
-});
 
 /*Test OK*/
 class Level{
@@ -78,16 +75,15 @@ class Level{
         if(grid){
             this.grid = grid;
             this.height = grid.length;
-            this.width = grid.reduce(function(prevVal, curVal, index){
-                if (curVal.length > prevVal)
-                    return curVal.length;
-                else
-                    return prevVal;
-            }, 0);
+            this.width = Math.max( ...grid.map(function (el) {
+                return el.length;
+            }) );
+
         } else {
             this.height = 0;
             this.width = 0;
         }
+
 
         if(actors){
             this.actors = actors;
@@ -132,15 +128,15 @@ class Level{
             return 'wall';
         }
 
-        let i = Math.floor(newActor.top);
-        let iTo = Math.ceil(newActor.bottom);
-        let j = Math.floor(newActor.left);
-        let jTo = Math.ceil(newActor.right);
+        let topFloored = Math.floor(newActor.top);
+        let bottomCeiled = Math.ceil(newActor.bottom);
+        let leftFloored = Math.floor(newActor.left);
+        let rightCeiled = Math.ceil(newActor.right);
 
-        for(let I = i; I < iTo; I++){
-            for(let J = j; J < jTo; J++){
-                if(this.grid[I][J]){
-                    return this.grid[I][J];
+        for(let i = topFloored; i < bottomCeiled; i++){
+            for(let j = leftFloored; j < rightCeiled; j++){
+                if(this.grid[i][j]){
+                    return this.grid[i][j];
                 }
             }
         }
@@ -188,15 +184,15 @@ const Player = class extends Actor{
         this.pos = pos.plus(new Vector(0, -0.5));
         this.size = size;
     }
-};
-Object.defineProperties(Player.prototype, {
-    type: {
-        value: 'player'
-    },
-    title: {
-        value: 'Игрок'
+    get type(){
+        return 'player';
     }
-});
+
+    get title(){
+        return 'Игрок';
+    }
+};
+
 
 /*Test OK*/
 class LevelParser{
@@ -229,14 +225,12 @@ class LevelParser{
     createGrid(grid){
         if(!grid)
             return;
-        const newGrid = [];
-        for(let row of grid){
-            newGrid.push([]);
-            for(let item of row.split('')){
-                newGrid[newGrid.length-1].push(this.obstacleFromSymbol(item));
-            }
-        }
-        return newGrid;
+        return grid.map( (row)=>{
+            return row.split('').map( (item)=>{
+                return this.obstacleFromSymbol(item);
+            });
+        });
+
     }
 
     createActors(grid){
@@ -256,7 +250,9 @@ class LevelParser{
                 }
             });
         });
+
         return actors;
+
     }
 
     parse(grid){
@@ -269,14 +265,13 @@ const Fireball = class extends Actor{
         super(pos);
         this.size = new Vector(1,1);
         this.speed = speed;
-        Object.defineProperties(this, {
-            type: {
-                value: 'fireball'
-            },
-            title: {
-                value: 'Fireball'
-            }
-        });
+    }
+
+    get type(){
+        return 'fireball';
+    }
+    get title(){
+        return 'Fireball';
     }
 
     getNextPosition(time = 1){
@@ -323,13 +318,8 @@ const Coin = class extends Actor{
         super();
         this.size = new Vector(0.6, 0.6);
         this.pos = pos.plus(new Vector(0.2, 0.1));
+        this.initPos = pos.plus(new Vector(0.2, 0.1));
         Object.defineProperties(this, {
-            type: {
-                value: 'coin'
-            },
-            title: {
-                value: 'Золотая монетка'
-            },
             spring: {
                 value: Math.random() * 2*Math.PI,
                 writable: true
@@ -343,11 +333,15 @@ const Coin = class extends Actor{
         });
     }
 
+    get type(){
+        return 'coin';
+    }
+    get title(){
+        return 'Золотая монетка';
+    }
+
     updateSpring(time = 1){
         this.spring += this.springSpeed*time;
-        // while(this.spring >= 2*Math.PI){
-        //     this.spring -= 2*Math.PI;
-        // }
     }
 
     getSpringVector(){
@@ -357,7 +351,7 @@ const Coin = class extends Actor{
 
     getNextPosition(time = 1){
         this.updateSpring(time);
-        return this.pos.plus(this.getSpringVector());
+        return this.initPos.plus(this.getSpringVector());
     }
 
     act(time){
