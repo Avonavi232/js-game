@@ -239,12 +239,11 @@ class LevelParser{
         if(!this.dict)
             return [];
         const actors = [];
-        const self = this;
-        grid.forEach( function (row, i) {
-            row.split('').forEach( function(item, j){
-                if(typeof self.actorFromSymbol(item) === 'function') {
-                    if ((self.actorFromSymbol(item)).prototype instanceof Actor || (self.actorFromSymbol(item)) === Actor) {
-                        let creator = self.actorFromSymbol(item);
+        grid.forEach( (row, i)=>{
+            row.split('').forEach( (item, j)=>{
+                if(typeof this.actorFromSymbol(item) === 'function') {
+                    if ((this.actorFromSymbol(item)).prototype instanceof Actor || (this.actorFromSymbol(item)) === Actor) {
+                        let creator = this.actorFromSymbol(item);
                         actors.push(new creator(new Vector(j, i)));
                     }
                 }
