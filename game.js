@@ -4,12 +4,6 @@ function wrt(data) {
     console.log(data);
 }
 
-function extender(base, props = {}) {
-    const result = class extends base {};
-    Object.defineProperties(result.prototype, props);
-    return result;
-}
-
 /*Test OK*/
 class Vector{
     constructor(posX = 0, posY = 0){
@@ -143,7 +137,7 @@ class Level{
     }
 
     removeActor(actor){
-        let toDelete = (this.actors).findIndex(function (el, i) {
+        let toDelete = (this.actors).findIndex(function (el) {
             return (el === actor);
         });
         this.actors.splice(toDelete, 1);
